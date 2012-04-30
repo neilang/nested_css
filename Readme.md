@@ -1,7 +1,7 @@
 Nested CSS
 ==========
 
-A proof of concept script to convert traditional CSS into the nested selector form used in LESS and SCSS/SASS.
+A proof of concept gem to convert traditional CSS into the nested selector form used in LESS and SCSS/SASS.
 
 How it works
 ------------
@@ -32,24 +32,34 @@ nav {
 ```
 
 Instructions
-------
-
-Once you download the repository you can use the ruby or bash script  in the base directory to generate nested CSS from a regular CSS file or STDIN.
-
-e.g.
-
-    nestedcss ~/filename.css
-
-Or
-
-    cat filename.css | nestedcss
+------------
 
 
+You can install by typing:
+
+    git clone git@github.com:neilang/nested_css.git
+    cd nested_css
+    bundle install
+    rake build
+    rake install
+
+
+You can now transform a css file like so: 
+
+    nested_css ~/Desktop/my_file.css
+
+Or from a remote file:
+
+    nested_css http://example.com/styles/main.css
+
+You can also set the indentation style via string (default is tabs):
+
+For two spaces instead of tabs:
+
+    nested_css --indent "  " ~/Desktop/my_file.css
+    
 
 Caveats
 -------
 
-Currently won't work with: 
-
-  * CSS imports
-  * Media Queries
+CSS rules will be re-ordered when parsed. Media queries are not currently supported. 
