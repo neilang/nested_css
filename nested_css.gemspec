@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.version     = NestedCSS::VERSION
   s.authors     = ["Neil Ang"]
   s.email       = ["neilang@gmail.com"]
-  s.homepage    = ""
+  s.homepage    = "https://github.com/neilang/nested_css"
   s.summary     = %q{Parses CSS and prints it in a nested form}
   s.description = %q{Convert traditional CSS into the nested selector form found in LESS and SCSS/SASS}
 
