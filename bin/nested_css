@@ -1,0 +1,53 @@
+#!/usr/bin/env ruby
+
+require 'nested_css'
+require 'optparse'
+
+options = {
+  :indent        => "\t",
+  :display_usage => true
+}
+
+optparse = OptionParser.new do |opts|
+  opts.banner = "Usage: nested_css [options] css_file_or_url"
+
+  opts.on("-i indent_string", "--indent indent_string", "Indentation string") do |i|
+    options[:indent] = i
+  end
+  
+  opts.on( '-v', '--version', 'Display the gem version' ) do
+    options[:display_usage] = false
+    puts NestedCSS::VERSION
+    exit
+  end
+  
+  opts.on( '-h', '--help', 'Display this screen' ) do
+    options[:display_usage] = false
+    puts opts
+    exit
+  end
+  
+end
+
+begin
+
+  optparse.parse!
+  
+  if ARGV.size != 1
+    raise OptionParser::MissingArgument
+  else
+    css_file = ARGV.first
+  end
+  
+rescue Exception => e
+
+  puts optparse if options[:display_usage]
+  exit
+  
+end
+
+nested_parser = NestedCSS::Parser.new
+nested_parser.indentation = options[:indent]
+nested_parser.parse_file(css_file)
+
+puts nested_parser.nested_css

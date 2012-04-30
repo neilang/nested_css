@@ -29,22 +29,22 @@ class ElementTest < Test::Unit::TestCase
   def test_add_same_selector
     e1 = @stylesheet.get_or_create_element('body')
     e2 = @stylesheet.get_or_create_element('body')
-    assert(1, @stylesheet.children.count)
+    assert_equal(1, @stylesheet.children.count)
     assert_equal(e1, e2)
   end
 
   def test_add_siblings
     e1 = @stylesheet.get_or_create_element('body')
     e2 = @stylesheet.get_or_create_element('div')
-    assert(2, @stylesheet.children.count)
+    assert_equal(2, @stylesheet.children.count)
     assert_not_equal(e1, e2)
   end
 
   def test_add_nested_siblings
     e1 = @stylesheet.get_or_create_element('body section')
     e2 = @stylesheet.get_or_create_element('body aside')
-    assert(1, @stylesheet.children.count)
-    assert(2, @stylesheet.children['body'])
+    assert_equal(1, @stylesheet.children.count)
+    assert_equal(2, @stylesheet.children['body'].children.count)
     assert_not_equal(e1, e2)
   end
 

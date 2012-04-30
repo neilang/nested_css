@@ -1,4 +1,6 @@
-require 'forwardable'
+require "nested_css/version"
+require "forwardable"
+require "css_parser"
 
 module NestedCSS
 
@@ -23,7 +25,6 @@ module NestedCSS
 
       element = selector_parts.shift
 
-      # Add it to the list of children if it doesn't exist
       if !@children.has_key?(element)
         @children[element] = Element.new
       end
@@ -78,55 +79,49 @@ module NestedCSS
     attr_accessor :indentation
 
     def initialize(css = nil)
-
       @stylesheet = nil
-
       self.indentation = "\t"
-
-      self.parse(css) unless css.nil?
-
+      self.parse_css(css) unless css.nil?
     end
 
-    def parse(css)
+    def parse_file(file)
+      css_parser = CssParser::Parser.new
+      css_parser.load_uri!(file)
+      parse(css_parser)
+    end
+
+    def parse_css(css)
+      css_parser = CssParser::Parser.new
+      css_parser.add_block!(css)
+      parse(css_parser)
+    end
+
+    def nested_css
+      nest_css_recursively(nil, nil, -1)
+    end
+
+    private
+
+    def parse(css_parser)
 
       @stylesheet = Stylesheet.new
 
-      # Remove all new lines
-      css = css.gsub(/[\r\n]/, '')
+      css_parser.each_selector(:all) do |selector, declarations, specificity|
 
-      # Remove all CSS comments
-      css = css.gsub(/\/\*[^(\*\/)]*\*\//, '')
+        element = stylesheet.get_or_create_element(selector)
 
-      css.strip!
-
-      # Divide into individual rules using the closing brace
-      rules = css.split('}')
-
-      # Iterate through each rule to create the tree
-      rules.each do |rule|
-
-        selectors, properties = rule.split('{', 2)
-
-        # Each rule may have multiple selector paths
-        selectors.split(',').each do |selector|
-          element = stylesheet.get_or_create_element(selector)
-
-          # Apply the properties to each selector
-          properties.split(';').each do |prop|
-            next if prop.strip.empty?
-            element.update_property(prop)
-          end
-
+        declarations.split(';').each do |prop|
+          next if prop.strip.empty?
+          element.update_property(prop)
         end
 
       end
       
       # Indicate if parse was successful
       @stylesheet.empty?
-      
     end
 
-    def nested_css(element = nil, name = nil, depth = -1)
+    def nest_css_recursively(element = nil, name = nil, depth = -1)
 
       # Get the root element 
       element ||= @stylesheet
@@ -139,7 +134,7 @@ module NestedCSS
       nested_indent = self.indentation + indent
       output        = ""
 
-      output += "#{indent}#{name} {\n" unless name.nil?
+      output += "#{indent}#{name} {\n" unless element.root
 
       unless element.properties.nil?
         element.properties.each_pair do |key, value|
@@ -149,11 +144,11 @@ module NestedCSS
 
       unless element.children.nil?
         element.children.each_pair do |child_name, child|
-          output += self.nested_css(child, child_name, depth+1)
+          output += nest_css_recursively(child, child_name, depth+1)
         end
       end
 
-      output += "#{indent}}\n" unless name.nil?
+      output += "#{indent}}\n" unless element.root
 
       output
 

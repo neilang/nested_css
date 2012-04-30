@@ -20,7 +20,7 @@ class OutputTest < Test::Unit::TestCase
 
   def test_standard_output
 
-    @parser.parse("body{color:red}")
+    @parser.parse_css("body{color:red}")
     nested_css = @parser.nested_css
 
     assert_not_nil(nested_css)
@@ -28,7 +28,7 @@ class OutputTest < Test::Unit::TestCase
   end
 
   def test_nested_output
-    @parser.parse("tr td{color:red}")
+    @parser.parse_css("tr td{color:red}")
     nested_css = @parser.nested_css
 
     assert_not_nil(nested_css)
